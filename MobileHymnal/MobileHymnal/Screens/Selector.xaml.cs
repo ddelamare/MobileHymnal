@@ -1,45 +1,78 @@
-﻿using MobileHymnal.Data;
+﻿using HymnalEntities.Hymnal;
+using MobileHymnal.Data;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Xamarin.Forms;
 
 namespace MobileHymnal.Screens
 {
+    public class SelectorViewModel
+    {
+        public List<Songbook> SongbookList { get; set; }
+        public Songbook SelectedSongbook { get; set; }
+        public int MaxHymnNumber { get; set; }
+    }
+
     public partial class Selector : ContentPage
     {
+        SelectorViewModel _model;
+
         public Selector()
         {
             InitializeComponent();
+            _model = BuildViewModel();
+            SetHymnNumberMax();
+            this.BindingContext = _model;
         }
 
-        void OnSliderValueChanged(object sender,
-                                  ValueChangedEventArgs args)
+        private SelectorViewModel BuildViewModel()
         {
-            valueLabel.Text = ((Slider)sender).Value.ToString("F3");
+            var vm = new SelectorViewModel();
+            vm.SongbookList = Database.GetContext().GetBooksWithSongs().Result;
+            vm.SelectedSongbook = vm.SongbookList.FirstOrDefault();
+            return vm;
         }
 
-        async void OnButtonClicked(object sender, EventArgs args)
+        private void NumberPressed(object sender, EventArgs e)
         {
-            Button button = (Button)sender;
-
-            await DisplayAlert("Clicked!",
-                "The button labeled '" + button.Text + "' has been clicked",
-                "OK");
+            hymnNumber.TextColor = Color.Black;
+            // If either of these fail, it will return 0;
+            int.TryParse(((Button)sender).Text, out int pressedNumber);
+            int.TryParse(hymnNumber.Text, out int parsedNumber);
+            // If text is numeric, append number. Otherwise clear and set.
+            int newNumber = (parsedNumber * 10) + pressedNumber;
+            if (newNumber > 0 && newNumber <= _model.MaxHymnNumber)
+            {
+                hymnNumber.Text = newNumber.ToString();
+            }
         }
 
-        void OnPutDataClicked(object sender, EventArgs args)
+        private void ClearPressed(object sender, EventArgs e)
         {
-            var db = Database.GetContext();
-            db.PutSomething();
+            hymnNumber.TextColor = Color.Gray;
+            hymnNumber.Text = "_ _ _ _";
         }
 
-        async void OnGetDataClicked(object sender, EventArgs args)
+        private void GoPressed(object sender, EventArgs e)
         {
-            Button button = (Button)sender;
-            var db = Database.GetContext();
-            
-            await DisplayAlert("Clicked!",
-                "The book titled' " + db.GetSomething() + "' has been found",
-                "OK");
+            hymnNumber.TextColor = Color.Blue;
+            hymnNumber.Text = "Going...";
+            DisplayAlert("Clicked!",
+            "The book titled' " + _model.SelectedSongbook.Title + "' has been found",
+            "OK");
+
+        }
+
+        private void SetHymnNumberMax()
+        {
+            // Todo: find number of hymns in current hymnal
+            _model.MaxHymnNumber = _model.SelectedSongbook.Title.Length;
+        }
+
+        private void hymnalPickedChanged(object sender, EventArgs e)
+        {
+            SetHymnNumberMax();
         }
     }
 }

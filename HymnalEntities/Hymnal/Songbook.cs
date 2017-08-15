@@ -12,25 +12,9 @@ namespace HymnalEntities.Hymnal
 
         public string Title { get; set; }
 
-
-        private List<Hymn> _hymns;
-
-        public void RefreshHymns()
+        public override string ToString()
         {
-            _hymns = new List<Hymn>();
-            //_hymns = GetHymnsForSongbook(Id);
-        }
-
-        public List<Hymn> Hymns
-        {
-            get
-            {
-                if (_hymns == null)
-                {
-                    RefreshHymns();
-                }
-                return _hymns;
-            }
+            return $"{Title}";
         }
     }
 }

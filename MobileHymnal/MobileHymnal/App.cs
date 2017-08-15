@@ -11,10 +11,6 @@ namespace MobileHymnal
 {
     public class Hymnal : Application
     {
-
-        // Global database instance
-        static HymnDatabase database;
-
         public Hymnal()
         {
             // The root page of your application
@@ -34,18 +30,6 @@ namespace MobileHymnal
         protected override void OnResume()
         {
             // Handle when your app resumes
-        }
-
-        public static HymnDatabase Database
-        {
-            get
-            {
-                if (database == null)
-                {
-                    database = new HymnDatabase(DependencyService.Get<IFileHelper>().GetLocalFilePath("TodoSQLite.db3"));
-                }
-                return database;
-            }
         }
     }
 }

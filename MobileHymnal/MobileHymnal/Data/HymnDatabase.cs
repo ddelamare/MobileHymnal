@@ -14,16 +14,32 @@ namespace MobileHymnal.Data
         SQLiteAsyncConnection _connection;
         public HymnDatabase(string connectionPath)
         {
-            _connection = new SQLiteAsyncConnection(connectionPath);
-            _connection.DropTableAsync<Songbook>().Wait();
-            _connection.CreateTableAsync<Songbook>().Wait();
+            try
+            {
+                _connection = new SQLiteAsyncConnection(connectionPath);
+                _connection.DropTableAsync<Songbook>().Wait();
+                _connection.CreateTableAsync<Songbook>().Wait();
+                // Seed test data
+                PutSomething("Black Hymnal");
+                PutSomething("Book 2");
+                PutSomething("My Book");
+            }
+            catch (Exception ex)
+            {
+                //TODO: Logging.
+            }
         }
 
-        public void PutSomething()
+        public Task<List<Songbook>> GetBooksWithSongs()
+        {
+            return _connection.Table<Songbook>().ToListAsync();
+        }
+
+        public void PutSomething(string title)
         {
             var sb = new Songbook()
             {
-                Title = "Black Hymnal"
+                Title = title
             };
             var res = _connection.InsertOrReplaceAsync(sb).Result;
         }
