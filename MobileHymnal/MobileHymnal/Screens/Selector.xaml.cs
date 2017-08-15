@@ -70,7 +70,7 @@ namespace MobileHymnal.Screens
             _model.MaxHymnNumber = _model.SelectedSongbook.Title.Length;
         }
 
-        private void hymnalPickedChanged(object sender, EventArgs e)
+        private void HymnalPickedChanged(object sender, EventArgs e)
         {
             SetHymnNumberMax();
         }
