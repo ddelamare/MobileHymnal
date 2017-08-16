@@ -57,17 +57,16 @@ namespace MobileHymnal.Screens
         private void GoPressed(object sender, EventArgs e)
         {
             hymnNumber.TextColor = Color.Blue;
-            hymnNumber.Text = "Going...";
-            DisplayAlert("Clicked!",
-            "The book titled' " + _model.SelectedSongbook.Title + "' has been found",
-            "OK");
-
+            int.TryParse(hymnNumber.Text, out int hymnNum);
+            var hymn = Database.GetContext().GetHymnByNumber(_model.SelectedSongbook?.Id, hymnNum);
+            hymnNumber.Text = hymn?.Title ?? "Not Found";
         }
 
         private void SetHymnNumberMax()
         {
             // Todo: find number of hymns in current hymnal
-            _model.MaxHymnNumber = _model.SelectedSongbook.Title.Length;
+            var hymnCount = Database.GetContext().CountHymnsInSongbook(_model.SelectedSongbook.Id);
+            _model.MaxHymnNumber = hymnCount;
         }
 
         private void HymnalPickedChanged(object sender, EventArgs e)

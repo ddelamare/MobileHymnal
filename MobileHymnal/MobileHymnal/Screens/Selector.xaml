@@ -1,8 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="MobileHymnal.Screens.Selector">
-    
+             x:Class="MobileHymnal.Screens.Selector"
+             Title="Hymn Selector">
+
     <ContentPage.Resources>
         <ResourceDictionary>
             <Color x:Key="borderColor" >Gray</Color>
@@ -29,72 +30,73 @@
             </Style>
         </ResourceDictionary>
     </ContentPage.Resources>
-
-    <StackLayout BackgroundColor="White" Padding="10" VerticalOptions="FillAndExpand">
-        <Label Text="BREAK1" Style="{StaticResource commonText}"/>
-
-        <Grid x:Name="numberGrid"
+    <RelativeLayout BackgroundColor="White">
+        <StackLayout 
+        VerticalOptions="FillAndExpand"
+        RelativeLayout.YConstraint="{ConstraintExpression Type=Constant, Constant=30}"
+        RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=0.8 }"
+        RelativeLayout.XConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=0.1}"
+        >
+            <Grid
                 RowSpacing="1" 
                 ColumnSpacing="1"
                 BackgroundColor="{StaticResource borderColor}" 
                 Padding="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="100" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <BoxView BackgroundColor="{StaticResource borderColor}" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="5"></BoxView>
-            <Label x:Name="hymnNumber" Text=" _ _ _ _" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="Gray" BackgroundColor="White"
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="2*" /> <!-- First ro, which has hymn number, should be twice as big -->
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <BoxView BackgroundColor="{StaticResource borderColor}" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="5"></BoxView>
+                <Label x:Name="hymnNumber" Text=" _ _ _ _" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="Gray" BackgroundColor="White"
         FontSize="60" Grid.ColumnSpan="3" />
-            <Button Text = "1" Grid.Row="1" Grid.Column="0"
+                <Button Text = "1" Grid.Row="1" Grid.Column="0"
                 Style="{StaticResource plainButton}" 
                 Clicked="NumberPressed"/>
-            <Button Text = "2" Grid.Row="1" Grid.Column="1"
+                <Button Text = "2" Grid.Row="1" Grid.Column="1"
                 Style="{StaticResource plainButton}" 
                 Clicked="NumberPressed"/>
-            <Button Text = "3" Grid.Row="1" Grid.Column="2"
+                <Button Text = "3" Grid.Row="1" Grid.Column="2"
                 Style="{StaticResource plainButton}" 
                 Clicked="NumberPressed"/>
-            <Button Text = "4" Grid.Row="2" Grid.Column="0"
+                <Button Text = "4" Grid.Row="2" Grid.Column="0"
                 Style="{StaticResource plainButton}"                 
                 Clicked="NumberPressed"/>
-            <Button Text = "5" Grid.Row="2" Grid.Column="1"
+                <Button Text = "5" Grid.Row="2" Grid.Column="1"
                 Style="{StaticResource plainButton}" 
                 Clicked="NumberPressed"/>
-            <Button Text = "6" Grid.Row="2" Grid.Column="2"
+                <Button Text = "6" Grid.Row="2" Grid.Column="2"
                 Style="{StaticResource plainButton}" 
                 Clicked="NumberPressed"/>
-            <Button Text = "7" Grid.Row="3" Grid.Column="0"
+                <Button Text = "7" Grid.Row="3" Grid.Column="0"
                 Style="{StaticResource plainButton}" 
                 Clicked="NumberPressed"/>
-            <Button Text = "8" Grid.Row="3" Grid.Column="1"
+                <Button Text = "8" Grid.Row="3" Grid.Column="1"
                 Style="{StaticResource plainButton}" 
                 Clicked="NumberPressed"/>
-            <Button Text = "9" Grid.Row="3" Grid.Column="2"
+                <Button Text = "9" Grid.Row="3" Grid.Column="2"
                 Style="{StaticResource plainButton}" 
                 Clicked="NumberPressed"/>
-            <Button Text = "X" Grid.Row="4" Grid.Column="0"
+                <Button Text = "X" Grid.Row="4" Grid.Column="0"
                 Style="{StaticResource clearButton}"
                 Clicked="ClearPressed"/>
-            <Button Text = "0" Grid.Row="4" Grid.Column="1"
+                <Button Text = "0" Grid.Row="4" Grid.Column="1"
                 Style="{StaticResource plainButton}" 
                 Clicked="NumberPressed"/>
-            <Button Text = "Go" Grid.Row="4" Grid.Column="2"
+                <Button Text = "Go" Grid.Row="4" Grid.Column="2"
                 Style="{StaticResource enterButton}" 
                 Clicked="GoPressed"/>
 
-        </Grid>
-        <Label Text="HERE" Style="{StaticResource commonText}"/>
-        <StackLayout>
-            <Label Text="BREAK" Style="{StaticResource commonText}"/>
+            </Grid>
+            <Label Text="Selected Hymnal" Style="{StaticResource commonText}"/>
             <Picker x:Name="hymnalPicker" 
-                    Style="{StaticResource commonText}" 
-                    ItemsSource="{Binding SongbookList}" 
-                    SelectedItem="{Binding SelectedSongbook, Mode=TwoWay}"
-                    SelectedIndexChanged="HymnalPickedChanged"/>
+                TextColor="Black"
+                ItemsSource="{Binding SongbookList}" 
+                SelectedItem="{Binding SelectedSongbook, Mode=TwoWay}"
+                SelectedIndexChanged="HymnalPickedChanged"/>
         </StackLayout>
-    </StackLayout>
+    </RelativeLayout>
 
 </ContentPage>

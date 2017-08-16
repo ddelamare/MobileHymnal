@@ -17,8 +17,12 @@ namespace MobileHymnal.Data
             try
             {
                 _connection = new SQLiteAsyncConnection(connectionPath);
+                //Drop seed data
                 _connection.DropTableAsync<Songbook>().Wait();
+                _connection.DropTableAsync<Hymn>().Wait();
+                // Create Tables
                 _connection.CreateTableAsync<Songbook>().Wait();
+                _connection.CreateTableAsync<Hymn>().Wait();
                 // Seed test data
                 PutSomething("Black Hymnal");
                 PutSomething("Book 2");
@@ -41,7 +45,17 @@ namespace MobileHymnal.Data
             {
                 Title = title
             };
-            var res = _connection.InsertOrReplaceAsync(sb).Result;
+            _connection.InsertOrReplaceAsync(sb).Wait(); // This sets the Id property
+            for (int i = 0; i < 10 + title.Length; i++)
+            {
+                var hymn = new Hymn()
+                {
+                    Title = $"Hymn {i + 1}",
+                    HymnNumber = i + 1,
+                    SongbookId = sb.Id.Value
+                };
+                _connection.InsertOrReplaceAsync(hymn);
+            }
         }
 
         public string GetSomething()
@@ -59,6 +73,31 @@ namespace MobileHymnal.Data
                 // TODO: Logging
             }
             return "Not Found";
+        }
+
+        public int CountHymnsInSongbook(int? id)
+        {
+            if (id.HasValue)
+            {
+                int bookId = id.GetValueOrDefault();
+                return _connection.Table<Hymn>().Where(h => h.SongbookId == bookId).CountAsync().Result;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        public Hymn GetHymnByNumber(int? songbookId, int? hymnNumber)
+        {
+            if (songbookId.HasValue && hymnNumber.HasValue)
+            {
+                return _connection.FindAsync<Hymn>(h => h.SongbookId == songbookId.Value && h.HymnNumber == hymnNumber.Value).Result;
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }
