@@ -61,6 +61,7 @@ namespace MobileHymnal.Screens
             var hymn = Database.GetContext().GetHymnByNumber(_model.SelectedSongbook?.Id, hymnNum);
             if (hymn != null)
             {
+                // TODO: Push to hymn view history
                 await Navigation.PushAsync(new HymnView(hymn));
             }
             else
@@ -79,6 +80,12 @@ namespace MobileHymnal.Screens
         private void HymnalPickedChanged(object sender, EventArgs e)
         {
             SetHymnNumberMax();
+        }
+
+        protected override void OnAppearing()
+        {
+            ClearPressed(null, null);
+            base.OnAppearing();
         }
     }
 }

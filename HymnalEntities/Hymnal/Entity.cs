@@ -11,7 +11,6 @@ namespace HymnalEntities.Hymnal
     {
         [PrimaryKey, AutoIncrement]
         // This is nullable to force the database to insert a new row when the Id is null. 
-
         public int? Id { get; set; }
 
         public Entity()

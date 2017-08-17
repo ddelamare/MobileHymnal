@@ -1,4 +1,5 @@
 ﻿using HymnalEntities.Hymnal;
+using MobileHymnal.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,16 +17,17 @@ namespace MobileHymnal.Screens
         Hymn _hymn = null;
 		public HymnView (Hymn pageHymn)
 		{
-            try
-            {
-                InitializeComponent();
-            }
-            catch (Exception ec)
-            {
-
-            }
+            InitializeComponent();
             _hymn = pageHymn;
             this.BindingContext = _hymn;
-		}
+            var lyrics = Database.GetContext().GetLyricsForHymn(_hymn.Id);
+            foreach (Lyric l in lyrics)
+            {
+                lyricView.Children.Add(new Label()
+                {
+                    Text = l.Verse
+                });
+            }
+        }
 	}
 }
