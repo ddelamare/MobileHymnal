@@ -1,4 +1,5 @@
 ﻿using MobileHymnal.Data;
+using MobileHymnal.Data.Config;
 using MobileHymnal.Screens;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,10 @@ namespace MobileHymnal
         public Hymnal()
         {
             // The root page of your application
-            MainPage = new Selector();
+            MainPage = new NavigationPage(new Selector()) {
+                Icon = null,
+                BarBackgroundColor = ConfigEngine.NavigationBarColor
+            };
         }
 
         protected override void OnStart()

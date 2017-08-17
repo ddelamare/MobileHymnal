@@ -54,12 +54,19 @@ namespace MobileHymnal.Screens
             hymnNumber.Text = "_ _ _ _";
         }
 
-        private void GoPressed(object sender, EventArgs e)
+        async private void GoPressed(object sender, EventArgs e)
         {
             hymnNumber.TextColor = Color.Blue;
             int.TryParse(hymnNumber.Text, out int hymnNum);
             var hymn = Database.GetContext().GetHymnByNumber(_model.SelectedSongbook?.Id, hymnNum);
-            hymnNumber.Text = hymn?.Title ?? "Not Found";
+            if (hymn != null)
+            {
+                await Navigation.PushAsync(new HymnView(hymn));
+            }
+            else
+            {
+                await DisplayAlert("Hymn not found", $"Hymn number {hymnNum} was not found in selected hymnal.", "OK");
+            }
         }
 
         private void SetHymnNumberMax()
