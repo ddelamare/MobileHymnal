@@ -8,13 +8,14 @@
         <ResourceDictionary>
             <Style x:Key="textStyle" TargetType="Label">
                 <Setter Property="FontSize" Value="{x:Static config:ConfigEngine.FontSize}" />
+                <Setter Property="TextColor" Value="{x:Static config:ConfigEngine.HymnTextColor}" />
             </Style>
         </ResourceDictionary>
     </ContentPage.Resources>
 
     <ContentPage.Content>
-        <ScrollView>
-            <StackLayout x:Name="lyricView" HorizontalOptions="Start" >
+        <ScrollView >
+            <StackLayout x:Name="lyricView" HorizontalOptions="Fill"  BackgroundColor="{x:Static config:ConfigEngine.HymnBackgroundColor}" Padding="20">
             </StackLayout>
         </ScrollView>
     </ContentPage.Content>
