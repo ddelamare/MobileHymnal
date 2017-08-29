@@ -15,18 +15,41 @@ namespace MobileHymnal.Screens
 	public partial class HymnView : ContentPage
 	{
         Hymn _hymn = null;
+        private string textClassName = "textStyle";
 		public HymnView (Hymn pageHymn)
 		{
             InitializeComponent();
             _hymn = pageHymn;
             this.BindingContext = _hymn;
             var lyrics = Database.GetContext().GetLyricsForHymn(_hymn.Id);
-            foreach (Lyric l in lyrics)
+            var verseNum = 1;
+            foreach (Lyric l in lyrics.Result.OrderBy(l => l.Order))
             {
-                lyricView.Children.Add(new Label()
+                if (l.IsChorus)
                 {
-                    Text = l.Verse
-                });
+                    lyricView.Children.Add(new Label()
+                    {
+                        Text = l.Verse,
+                        Margin= new Thickness(20,10),
+                        TextColor = Color.Gray,
+                        Style = (Style)Resources[textClassName]
+                    });
+                }
+                else
+                {
+                    lyricView.Children.Add(new Label()
+                    {
+                        Text = verseNum.ToString(),
+                        FontAttributes = FontAttributes.Bold,
+                        Style = (Style)Resources[textClassName]
+                    });
+                    verseNum++;
+                    lyricView.Children.Add(new Label()
+                    {
+                        Text = l.Verse,
+                        Style = (Style)Resources[textClassName]
+                    });
+                }
             }
         }
 	}

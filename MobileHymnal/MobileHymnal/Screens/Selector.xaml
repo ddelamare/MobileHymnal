@@ -50,7 +50,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <BoxView BackgroundColor="{StaticResource borderColor}" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="5"></BoxView>
-                <Label x:Name="hymnNumber" Text=" _ _ _ _" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="Gray" BackgroundColor="White"
+                <Label x:Name="hymnNumber" Text="{Binding HymnLabel, Mode=OneWay}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="Gray" BackgroundColor="White"
         FontSize="60" Grid.ColumnSpan="3" />
                 <Button Text = "1" Grid.Row="1" Grid.Column="0"
                 Style="{StaticResource plainButton}" 

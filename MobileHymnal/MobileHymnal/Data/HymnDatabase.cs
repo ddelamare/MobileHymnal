@@ -2,9 +2,13 @@
 using SQLite;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace MobileHymnal.Data
 {
@@ -17,24 +21,7 @@ namespace MobileHymnal.Data
             try
             {
                 _connection = new SQLiteAsyncConnection(connectionPath);
-                //Drop seed data
-                _connection.DropTableAsync<Songbook>().Wait();
-                _connection.DropTableAsync<Hymn>().Wait();
-                _connection.DropTableAsync<Hymn_Lyric>().Wait();
-                _connection.DropTableAsync<Hymn_Tag>().Wait();
-                _connection.DropTableAsync<Lyric>().Wait();
-                _connection.DropTableAsync<Tag>().Wait();
-                // Create Tables
-                _connection.CreateTableAsync<Songbook>().Wait();
-                _connection.CreateTableAsync<Hymn>().Wait();
-                _connection.CreateTableAsync<Hymn_Lyric>().Wait();
-                _connection.CreateTableAsync<Hymn_Tag>().Wait();
-                _connection.CreateTableAsync<Lyric>().Wait();
-                _connection.CreateTableAsync<Tag>().Wait();
-                // Seed test data
-                PutSomething("Black Hymnal");
-                PutSomething("Book 2");
-                PutSomething("My Book");
+                InitDatabase(true);
             }
             catch (Exception ex)
             {
@@ -42,11 +29,99 @@ namespace MobileHymnal.Data
             }
         }
 
+        public void InitDatabase(bool seed)
+        {
+
+            if (seed)
+            {
+                //Drop seed data
+                _connection.DropTableAsync<Songbook>().Wait();
+                _connection.DropTableAsync<Hymn>().Wait();
+                _connection.DropTableAsync<Hymn_Tag>().Wait();
+                _connection.DropTableAsync<Lyric>().Wait();
+                _connection.DropTableAsync<Tag>().Wait();
+            }
+             //Create Tables. TODO: Optimize so that it doesn't attempt to create every time.
+            _connection.CreateTableAsync<Songbook>().Wait();
+            _connection.CreateTableAsync<Hymn>().Wait();
+            _connection.CreateTableAsync<Hymn_Tag>().Wait();
+            _connection.CreateTableAsync<Lyric>().Wait();
+            _connection.CreateTableAsync<Tag>().Wait();
+
+            if (seed)
+            {
+                // Find all seed files
+                var assembly = typeof(Database).GetTypeInfo().Assembly;
+                var seedFiles = assembly.GetManifestResourceNames();
+                foreach (var seedFile in seedFiles.Where(name => name.EndsWith(".seed")))
+                {
+                    Stream stream = assembly.GetManifestResourceStream(seedFile);
+                    string rawJson = "";
+                    using (var reader = new System.IO.StreamReader(stream))
+                    {
+                        rawJson = reader.ReadToEnd();
+                    }
+                    ImportHymnal(rawJson);
+                }
+            }
+        }
+
+        private void ImportHymnal(string rawJson)
+        {
+            var songbook = JObject.Parse(rawJson);
+            songbook.TryGetValue("Title", out JToken title);
+            var sb = new Songbook()
+            {
+                Title = title?.Value<string>() ?? "You should really title this"
+            };
+            _connection.InsertOrReplaceAsync(sb).Wait(); // This sets the Id property
+            var hymns = songbook["Hymns"];
+            foreach (var h in hymns)
+            {
+                var hm = new Hymn()
+                {
+                    SongbookId = sb.Id.GetValueOrDefault(),
+                    HymnNumber = h["hymnNumber"].Value<int>()
+                };
+                _connection.InsertOrReplaceAsync(hm).ContinueWith((res) =>
+                {
+                    for (int i = 0; i < h["lyrics"].Count(); i++)
+                    {
+                        var l = h["lyrics"][i];
+                        var ly = new Lyric()
+                        {
+                            IsChorus = l["isChorus"].Value<bool>(),
+                            Verse = l["text"].Value<string>(),
+                            Order = i + 1,
+                            HymnId = hm.Id.Value
+                        };
+                        _connection.InsertOrReplaceAsync(ly).ConfigureAwait(false);
+                    }
+                });
+                //for (int i = 0; i < h["lyrics"].Count(); i++)
+                // {
+                //     var l = h["lyrics"][i];
+                //     var ly = new Lyric()
+                //     {
+                //         IsChorus = l["isChorus"].Value<bool>(),
+                //         Verse = l["text"].Value<string>(),
+                //         Order = i + 1,
+                //         HymnId = hm.Id.Value
+                //     };
+                //     _connection.InsertOrReplaceAsync(ly).Wait();
+                //}
+
+
+            }
+
+        }
+
         public Task<List<Songbook>> GetBooksWithSongs()
         {
             return _connection.Table<Songbook>().ToListAsync();
         }
 
+        // Test 
         public void PutSomething(string title)
         {
             var sb = new Songbook()
@@ -69,15 +144,16 @@ namespace MobileHymnal.Data
                     var lyric = new Lyric()
                     {
                         Order = j,
-                        Verse = line + $"for hymn {hymn.HymnNumber}"
+                        Verse = line + $"for hymn {hymn.HymnNumber}",
+                        HymnId = hymn.Id.Value
                     };
                     line = line + line;
                     _connection.InsertOrReplaceAsync(lyric).Wait();
-                    _connection.InsertOrReplaceAsync(new Hymn_Lyric() { ParentId = hymn.Id.Value, ChildId = lyric.Id.Value });
                 }
             }
         }
 
+        //Test Fetch
         public string GetSomething()
         {
             try
@@ -97,6 +173,7 @@ namespace MobileHymnal.Data
 
         public int CountHymnsInSongbook(int? id)
         {
+            // TODO: Change to max hymn number
             if (id.HasValue)
             {
                 int bookId = id.GetValueOrDefault();
@@ -120,14 +197,13 @@ namespace MobileHymnal.Data
             }
         }
 
-        public List<Lyric> GetLyricsForHymn(int? hymnId)
+        async public Task<List<Lyric>> GetLyricsForHymn(int? hymnId)
         {
             if (hymnId.GetValueOrDefault() == 0)
             {
                 return new List<Lyric>();
             }
-            var lyrics = _connection.Table<Hymn_Lyric>().Where(hl => hl.ParentId == hymnId.Value).ToListAsync().Result;
-            return FetchLinkedEntities<Lyric, Hymn_Lyric>(hymnId);
+            return await _connection.Table<Lyric>().Where(l => l.HymnId == hymnId.Value).ToListAsync().ConfigureAwait(false);
         }
 
         // Attempt to auto join via link table. TODO: Add query caching

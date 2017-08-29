@@ -9,6 +9,7 @@ namespace HymnalEntities.Hymnal
     public class Lyric : Entity
     {
         public string Verse {get;set;}
+        public int HymnId { get; set; }
         public int Order { get; set; } 
         public bool IsChorus { get; set; }
     }

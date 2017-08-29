@@ -47,13 +47,13 @@
   <ItemGroup>
     <Compile Include="Hymnal\Entity.cs" />
     <Compile Include="Hymnal\Hymn.cs" />
-    <Compile Include="Hymnal\Hymn_Lyric.cs" />
     <Compile Include="Hymnal\Hymn_Tag.cs" />
     <Compile Include="Hymnal\LinkTable.cs" />
     <Compile Include="Hymnal\Lyric.cs" />
     <Compile Include="Hymnal\Songbook.cs" />
     <Compile Include="Hymnal\Tag.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModel\BaseViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="SQLite-net, Version=1.4.118.0, Culture=neutral, processorArchitecture=MSIL">
