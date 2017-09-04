@@ -1,4 +1,5 @@
-﻿using Plugin.Settings;
+﻿using HymnalEntities.ViewModel;
+using Plugin.Settings;
 using Plugin.Settings.Abstractions;
 using System;
 using System.Collections.Generic;
@@ -10,11 +11,20 @@ using Xamarin.Forms;
 
 namespace MobileHymnal.Data.Config
 {
-    public static class ConfigEngine
+    public class ConfigEngine : BaseViewModel
     {
-        private static ISettings AppSettings => DependencyService.Get<IConfigStorage>().GetSettings();
+        // Singleton instance
+        private static readonly ConfigEngine instance = new ConfigEngine();
+        public static ConfigEngine Current
+        {
+            get
+            {
+                return instance;
+            }
+        }
+        private static ISettings AppSettings => CrossSettings.Current;
         // TODO: Load themes
-        public static Color NavigationBarColor {
+        public Color NavigationBarColor {
             get
             {
                 return FetchColor(defaultColor: new Color(.5,.5,.5));
@@ -22,10 +32,11 @@ namespace MobileHymnal.Data.Config
             set
             {
                 SetColor(value);
+                OnPropertyChanged();
             }
         }
 
-        public static Color HymnTextColor
+        public Color HymnTextColor
         {
             get
             {
@@ -34,10 +45,11 @@ namespace MobileHymnal.Data.Config
             set
             {
                 SetColor(value);
+                OnPropertyChanged();
             }
         }
 
-        public static Color HymnChorusColor
+        public Color HymnChorusColor
         {
             get
             {
@@ -46,10 +58,11 @@ namespace MobileHymnal.Data.Config
             set
             {
                 SetColor(value);
+                OnPropertyChanged();
             }
         }
 
-        public static Color HymnBackgroundColor
+        public Color HymnBackgroundColor
         {
             get
             {
@@ -58,18 +71,23 @@ namespace MobileHymnal.Data.Config
             set
             {
                 SetColor(value);
+                OnPropertyChanged();
             }
         }
 
         // For Font size slider
-        public static int FontSize
+        public int FontSize
         {
             get => AppSettings.GetValueOrDefault(nameof(FontSize), 20);
-            set => AppSettings.AddOrUpdateValue(nameof(FontSize), value);
+            set
+            {
+                AppSettings.AddOrUpdateValue(nameof(FontSize), value);
+                OnPropertyChanged();
+            }
         }
 
         #region Helpers
-        private static Color FetchColor([CallerMemberName]string keyName = "", Color? defaultColor = null)
+        private Color FetchColor([CallerMemberName]string keyName = "", Color? defaultColor = null)
         {
             double r = 0, g = 0, b = 0;
             r = AppSettings.GetValueOrDefault(keyName + "_R", (double)defaultColor.GetValueOrDefault().R);
@@ -78,7 +96,7 @@ namespace MobileHymnal.Data.Config
             return new Color(r, g, b);
         }
 
-        private static void SetColor(Color color, [CallerMemberName]string keyName = "")
+        private void SetColor(Color color, [CallerMemberName]string keyName = "")
         {
             if (color == null)
             {

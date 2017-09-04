@@ -41,12 +41,16 @@ namespace MobileHymnal.Data
                 _connection.DropTableAsync<Lyric>().Wait();
                 _connection.DropTableAsync<Tag>().Wait();
             }
-             //Create Tables. TODO: Optimize so that it doesn't attempt to create every time.
-            _connection.CreateTableAsync<Songbook>().Wait();
-            _connection.CreateTableAsync<Hymn>().Wait();
-            _connection.CreateTableAsync<Hymn_Tag>().Wait();
-            _connection.CreateTableAsync<Lyric>().Wait();
-            _connection.CreateTableAsync<Tag>().Wait();
+            //Create Tables. TODO: Optimize so that it doesn't attempt to create every time.
+            var initTasks = new List<Task>() {
+            _connection.CreateTableAsync<Songbook>(),
+            _connection.CreateTableAsync<Hymn>(),
+            _connection.CreateTableAsync<Hymn_Tag>(),
+            _connection.CreateTableAsync<Lyric>(),
+            _connection.CreateTableAsync<Tag>()
+            };
+
+            Task.WaitAll(initTasks.ToArray());
 
             if (seed)
             {
@@ -98,20 +102,6 @@ namespace MobileHymnal.Data
                         _connection.InsertOrReplaceAsync(ly).ConfigureAwait(false);
                     }
                 });
-                //for (int i = 0; i < h["lyrics"].Count(); i++)
-                // {
-                //     var l = h["lyrics"][i];
-                //     var ly = new Lyric()
-                //     {
-                //         IsChorus = l["isChorus"].Value<bool>(),
-                //         Verse = l["text"].Value<string>(),
-                //         Order = i + 1,
-                //         HymnId = hm.Id.Value
-                //     };
-                //     _connection.InsertOrReplaceAsync(ly).Wait();
-                //}
-
-
             }
 
         }

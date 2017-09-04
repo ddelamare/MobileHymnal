@@ -1,0 +1,14 @@
+﻿<Application xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+             xmlns:config="clr-namespace:MobileHymnal.Data.Config"
+             x:Class="MobileHymnal.Hymnal">
+    <Application.Resources>
+        <ResourceDictionary>
+            <config:ConfigEngine x:Key="configuration"/>
+            <Style x:Key="textStyle" TargetType="Label">
+                <Setter Property="FontSize" Value="{Binding FontSize, Source={StaticResource  configuration}}" />
+                <Setter Property="TextColor" Value="{Binding HymnTextColor, Source={StaticResource  configuration}}" />
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

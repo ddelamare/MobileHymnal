@@ -73,16 +73,23 @@ namespace MobileHymnal.Screens
 
         async private void GoPressed(object sender, EventArgs e)
         {
-            int.TryParse(_model.HymnLabel, out int hymnNum);
-            var hymn = Database.GetContext().GetHymnByNumber(_model.SelectedSongbook?.Id, hymnNum);
-            if (hymn != null)
+            try
             {
-                // TODO: Push to hymn view history
-                await Navigation.PushAsync(new HymnView(hymn));
+                int.TryParse(_model.HymnLabel, out int hymnNum);
+                var hymn = Database.GetContext().GetHymnByNumber(_model.SelectedSongbook?.Id, hymnNum);
+                if (hymn != null)
+                {
+                    // TODO: Push to hymn view history
+                    await Navigation.PushAsync(new HymnView(hymn));
+                }
+                else if (hymnNum > 0)
+                {
+                    await DisplayAlert("Hymn not found", $"Hymn number {hymnNum} was not found in selected hymnal.", "OK");
+                }
             }
-            else if(hymnNum > 0)
+            catch (Exception ex)
             {
-                await DisplayAlert("Hymn not found", $"Hymn number {hymnNum} was not found in selected hymnal.", "OK");
+
             }
         }
 

@@ -7,18 +7,26 @@ using System.Linq;
 using System.Text;
 
 using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
 
 namespace MobileHymnal
 {
-    public class Hymnal : Application
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class Hymnal : Application
     {
         public Hymnal()
         {
-            // The root page of your application
+            InitializeComponent();
+            // Load 
             MainPage = new NavigationPage(new Selector()) {
                 Icon = null,
-                BarBackgroundColor = ConfigEngine.NavigationBarColor
+                BarBackgroundColor = ConfigEngine.Current.NavigationBarColor
             };
+            Application.Current.Resources["configuration"] = ConfigEngine.Current;
+            MainPage.ToolbarItems.Add(new ToolbarItem("Config", "", () =>
+            {
+                ((NavigationPage)MainPage).PushAsync(new Config());
+            }));
         }
 
         protected override void OnStart()

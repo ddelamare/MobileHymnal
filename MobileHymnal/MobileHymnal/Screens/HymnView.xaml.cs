@@ -1,5 +1,6 @@
 ﻿using HymnalEntities.Hymnal;
 using MobileHymnal.Data;
+using MobileHymnal.Data.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +33,7 @@ namespace MobileHymnal.Screens
                         Text = l.Verse,
                         Margin= new Thickness(20,10),
                         TextColor = Color.Gray,
-                        Style = (Style)Resources[textClassName]
+                        Style = (Style)Application.Current.Resources[textClassName]
                     });
                 }
                 else
@@ -41,16 +42,17 @@ namespace MobileHymnal.Screens
                     {
                         Text = verseNum.ToString(),
                         FontAttributes = FontAttributes.Bold,
-                        Style = (Style)Resources[textClassName]
+                        Style = (Style)(Style)Application.Current.Resources[textClassName]
                     });
                     verseNum++;
                     lyricView.Children.Add(new Label()
                     {
                         Text = l.Verse,
-                        Style = (Style)Resources[textClassName]
+                        Style = (Style)(Style)Application.Current.Resources[textClassName]
                     });
                 }
             }
         }
+
 	}
 }

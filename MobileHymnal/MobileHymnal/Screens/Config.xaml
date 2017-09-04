@@ -2,11 +2,15 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:config="clr-namespace:MobileHymnal.Data.Config"
-             x:Class="MobileHymnal.Screens.HymnView"
-             Title="{Binding Title}">
+             x:Class="MobileHymnal.Screens.Config">
     <ContentPage.Content>
         <ScrollView>
-            <StackLayout x:Name="lyricView" HorizontalOptions="Fill"  BackgroundColor="{Binding HymnBackgroundColor, Source={StaticResource  configuration}}" Padding="20">
+            <StackLayout>
+                <Label Text="Config"/>
+                <Slider x:Name="scaleSlider"
+            Maximum="100"
+            Value="{Binding FontSize, Mode=TwoWay, Source={StaticResource  configuration}}" />
+                <Button x:Name="closeButton" Clicked="closeButton_Clicked"  Text="Close"/>
             </StackLayout>
         </ScrollView>
     </ContentPage.Content>
