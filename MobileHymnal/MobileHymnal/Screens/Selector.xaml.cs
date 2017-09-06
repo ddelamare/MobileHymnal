@@ -42,7 +42,13 @@ namespace MobileHymnal.Screens
             this.BindingContext = _model;
         }
 
-        private SelectorViewModel BuildViewModel()
+        public void RefreshViewModel()
+        {
+            _model = BuildViewModel();
+            BindingContext = _model;
+        }
+
+        public SelectorViewModel BuildViewModel()
         {
             var vm = new SelectorViewModel();
             vm.SongbookList = Database.GetContext().GetBooksWithSongs().Result;
@@ -67,7 +73,7 @@ namespace MobileHymnal.Screens
 
         private void ClearPressed(object sender, EventArgs e)
         {
-            hymnNumber.TextColor = Color.Gray;
+            //hymnNumber.TextColor = Color.Gray;
             _model.HymnLabel = "_ _ _ _";
         }
 

@@ -5,10 +5,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Xamarin.Forms;
+using Plugin.FilePicker.Abstractions;
 
 namespace MobileHymnal.Data
 {
@@ -21,7 +21,8 @@ namespace MobileHymnal.Data
             try
             {
                 _connection = new SQLiteAsyncConnection(connectionPath);
-                InitDatabase(true);
+                
+                InitDatabase(false);
             }
             catch (Exception ex)
             {
@@ -65,13 +66,32 @@ namespace MobileHymnal.Data
                     {
                         rawJson = reader.ReadToEnd();
                     }
-                    ImportHymnal(rawJson);
+                    ImportHymnalFromJson(rawJson);
                 }
             }
         }
 
-        private void ImportHymnal(string rawJson)
+        public bool ImportHymnal(FileData file)
         {
+            var json = System.Text.Encoding.UTF8.GetString(file.DataArray, 0, file.DataArray.Length);
+            return ImportHymnalFromJson(json);
+        }
+
+        public void ImportHymnal(string filePath)
+        {
+            IFileHelper file = DependencyService.Get<IFileHelper>();
+            string rawJson = "";
+            using (var reader = new System.IO.StreamReader(file.GetFileStream(filePath)))
+            {
+                rawJson = reader.ReadToEnd();
+                ImportHymnal(rawJson);
+            }
+        }
+
+        private bool ImportHymnalFromJson(string rawJson)
+        {
+            var hymnDict = new Dictionary<Guid, Hymn>();
+            var lyricDict = new Dictionary<Guid, List<Lyric>>();
             var songbook = JObject.Parse(rawJson);
             songbook.TryGetValue("Title", out JToken title);
             var sb = new Songbook()
@@ -79,31 +99,53 @@ namespace MobileHymnal.Data
                 Title = title?.Value<string>() ?? "You should really title this"
             };
             _connection.InsertOrReplaceAsync(sb).Wait(); // This sets the Id property
+
             var hymns = songbook["Hymns"];
+            var tasks = new List<Task>();
+            // Load it all into memory
             foreach (var h in hymns)
             {
+                var insertGuid = Guid.NewGuid();
                 var hm = new Hymn()
                 {
                     SongbookId = sb.Id.GetValueOrDefault(),
                     HymnNumber = h["hymnNumber"].Value<int>()
                 };
-                _connection.InsertOrReplaceAsync(hm).ContinueWith((res) =>
-                {
-                    for (int i = 0; i < h["lyrics"].Count(); i++)
-                    {
-                        var l = h["lyrics"][i];
-                        var ly = new Lyric()
-                        {
-                            IsChorus = l["isChorus"].Value<bool>(),
-                            Verse = l["text"].Value<string>(),
-                            Order = i + 1,
-                            HymnId = hm.Id.Value
-                        };
-                        _connection.InsertOrReplaceAsync(ly).ConfigureAwait(false);
-                    }
-                });
-            }
+                hymnDict.Add(insertGuid, hm);
 
+                List<Lyric> lyrics = new List<Lyric>();
+                for (int i = 0; i < h["lyrics"].Count(); i++)
+                {
+                    var l = h["lyrics"][i];
+                    var ly = new Lyric()
+                    {
+                        IsChorus = l["isChorus"].Value<bool>(),
+                        Verse = l["text"].Value<string>(),
+                        Order = i + 1
+                    };
+                    lyrics.Add(ly);
+                }
+                lyricDict.Add(insertGuid, lyrics);
+            }
+            _connection.InsertAllAsync(hymnDict.Values).Wait();
+            var masterLyricsList = new List<Lyric>();
+            foreach (var hymn in hymnDict)
+            {
+                var guid = hymn.Key;
+                var hymnId = hymn.Value.Id.Value;
+                var lyrics = lyricDict[guid];
+                if (lyrics != null)
+                {
+                    foreach (var lyric in lyrics)
+                    {
+                        lyric.HymnId = hymnId;
+                    }
+                    masterLyricsList.AddRange(lyrics);
+                }
+            }
+            _connection.InsertAllAsync(masterLyricsList);
+
+            return true;
         }
 
         public Task<List<Songbook>> GetBooksWithSongs()
