@@ -25,7 +25,7 @@ namespace MobileHymnal.Screens
 
         private void closeButton_Clicked(object sender, EventArgs e)
         {
-            ((MasterDetailPage)Application.Current.MainPage).IsPresented = false;
+            Navigation.PopAsync();
         }
 
         private async void importButton_Clicked(object sender, EventArgs e)

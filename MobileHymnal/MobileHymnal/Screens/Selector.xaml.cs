@@ -1,6 +1,7 @@
 ﻿using HymnalEntities.Hymnal;
 using HymnalEntities.ViewModel;
 using MobileHymnal.Data;
+using MobileHymnal.Data.Config;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -52,7 +53,8 @@ namespace MobileHymnal.Screens
         {
             var vm = new SelectorViewModel();
             vm.SongbookList = Database.GetContext().GetBooksWithSongs().Result;
-            vm.SelectedSongbook = vm.SongbookList.FirstOrDefault();
+            // Attempt to load last selected or first.
+            vm.SelectedSongbook = vm.SongbookList.FirstOrDefault(sb => sb.Id == ConfigEngine.Current.SelectedSongbookId) ?? vm.SongbookList.FirstOrDefault();
             vm.HymnLabel = "_ _ _ _";
             return vm;
         }
@@ -109,6 +111,7 @@ namespace MobileHymnal.Screens
         private void HymnalPickedChanged(object sender, EventArgs e)
         {
             SetHymnNumberMax();
+            ConfigEngine.Current.SelectedSongbookId = _model.SelectedSongbook.Id.GetValueOrDefault();
         }
 
         protected override void OnAppearing()

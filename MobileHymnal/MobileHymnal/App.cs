@@ -18,16 +18,17 @@ namespace MobileHymnal
         {
             InitializeComponent();
             // Load 
-            MainPage = new MasterDetailPage()
+            Navigation = new NavigationPage(new Selector())
             {
-                Master = new Config() {  Title ="Master"},
-                Detail = new NavigationPage(new Selector())
-                {
-                    Icon = null,
-                    BarBackgroundColor = ConfigEngine.Current.NavigationBarColor
-                },
-                Title = "Ball"
+                Icon = null,
+                BarBackgroundColor = ConfigEngine.Current.NavigationBarColor
             };
+            MasterDetail = new MasterDetailPage()
+            {
+                Master = new MenuDrawer() { Title = "Menu" },
+                Detail = Navigation
+            };
+            MainPage = MasterDetail;
             Application.Current.Resources["configuration"] = ConfigEngine.Current;
         }
 
@@ -45,5 +46,8 @@ namespace MobileHymnal
         {
             // Handle when your app resumes
         }
+
+        public static NavigationPage Navigation { get; set; }
+        public static MasterDetailPage MasterDetail { get; private set; }
     }
 }

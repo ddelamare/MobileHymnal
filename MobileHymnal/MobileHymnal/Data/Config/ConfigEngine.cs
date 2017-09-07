@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Forms;
+using HymnalEntities.Hymnal;
 
 namespace MobileHymnal.Data.Config
 {
@@ -86,8 +87,18 @@ namespace MobileHymnal.Data.Config
             }
         }
 
-        #region Helpers
-        private Color FetchColor([CallerMemberName]string keyName = "", Color? defaultColor = null)
+        public int SelectedSongbookId { 
+            get => AppSettings.GetValueOrDefault(nameof(SelectedSongbookId), 0);
+            set
+            {
+                AppSettings.AddOrUpdateValue(nameof(SelectedSongbookId), value);
+                OnPropertyChanged();
+            }
+        }
+
+
+    #region Helpers
+    private Color FetchColor([CallerMemberName]string keyName = "", Color? defaultColor = null)
         {
             double r = 0, g = 0, b = 0;
             r = AppSettings.GetValueOrDefault(keyName + "_R", (double)defaultColor.GetValueOrDefault().R);
