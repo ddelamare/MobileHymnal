@@ -114,6 +114,7 @@ namespace MobileHymnal.Screens
         protected override void OnAppearing()
         {
             ClearPressed(null, null);
+            RefreshViewModel();
             base.OnAppearing();
         }
     }

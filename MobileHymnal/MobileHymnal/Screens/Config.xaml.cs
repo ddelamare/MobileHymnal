@@ -21,13 +21,11 @@ namespace MobileHymnal.Screens
             // Workaround for Xamarin bug on setting min val
                 scaleSlider.Minimum = 8;
                 scaleSlider.Value = ConfigEngine.Current.FontSize;
-
-            sampleLabel.Style = (Style)Application.Current.Resources["textStyle"];
         }
 
         private void closeButton_Clicked(object sender, EventArgs e)
         {
-            Navigation.PopAsync();
+            ((MasterDetailPage)Application.Current.MainPage).IsPresented = false;
         }
 
         private async void importButton_Clicked(object sender, EventArgs e)
@@ -36,31 +34,14 @@ namespace MobileHymnal.Screens
             FileData filedata = await CrossFilePicker.Current.PickFile();
             try
             {
-                var importSuccess = Data.Database.GetContext().ImportHymnal(filedata);
+                Data.Database.GetContext().ImportHymnal(filedata);
+                await DisplayAlert("Import Success", "Import Complete.", "OK");
             }
             catch (Exception ex)
             {
-                // TODO: Be graceful.
-                throw;
+                await DisplayAlert("Import Failed", "Importing the hymnal failed. Probably because it is not in the right format", "OK");
             }
             waitSpinner.IsVisible = false;
-
-        }
-
-        protected override void OnDisappearing()
-        {
-            foreach (var page in Navigation.NavigationStack)
-            {
-                if (page is Selector)
-                {
-                    ((Selector)page).RefreshViewModel();
-                }
-                else if (page is HymnView)
-                {
-                    //TODO refresh bindings somehow
-                }
-            }
-            base.OnDisappearing();
         }
     }
 }

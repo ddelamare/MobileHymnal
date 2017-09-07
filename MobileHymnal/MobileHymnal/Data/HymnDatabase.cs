@@ -77,17 +77,6 @@ namespace MobileHymnal.Data
             return ImportHymnalFromJson(json);
         }
 
-        public void ImportHymnal(string filePath)
-        {
-            IFileHelper file = DependencyService.Get<IFileHelper>();
-            string rawJson = "";
-            using (var reader = new System.IO.StreamReader(file.GetFileStream(filePath)))
-            {
-                rawJson = reader.ReadToEnd();
-                ImportHymnal(rawJson);
-            }
-        }
-
         private bool ImportHymnalFromJson(string rawJson)
         {
             var hymnDict = new Dictionary<Guid, Hymn>();
@@ -151,56 +140,6 @@ namespace MobileHymnal.Data
         public Task<List<Songbook>> GetBooksWithSongs()
         {
             return _connection.Table<Songbook>().ToListAsync();
-        }
-
-        // Test 
-        public void PutSomething(string title)
-        {
-            var sb = new Songbook()
-            {
-                Title = title
-            };
-            _connection.InsertOrReplaceAsync(sb).Wait(); // This sets the Id property
-            for (int i = 0; i < 10 + title.Length; i++)
-            {
-                var hymn = new Hymn()
-                {
-                    Title = $"Hymn {i + 1}",
-                    HymnNumber = i + 1,
-                    SongbookId = sb.Id.Value
-                };
-                _connection.InsertOrReplaceAsync(hymn).Wait();
-                string line = "This is a line\n";
-                for (int j = 0; j < 5; j++)
-                {
-                    var lyric = new Lyric()
-                    {
-                        Order = j,
-                        Verse = line + $"for hymn {hymn.HymnNumber}",
-                        HymnId = hymn.Id.Value
-                    };
-                    line = line + line;
-                    _connection.InsertOrReplaceAsync(lyric).Wait();
-                }
-            }
-        }
-
-        //Test Fetch
-        public string GetSomething()
-        {
-            try
-            {
-                Songbook book = _connection.FindAsync<Songbook>(sb => sb.Id == 1).Result;
-                if (book != null)
-                {
-                    return book.Title;
-                }
-            }
-            catch (Exception ex)
-            {
-                // TODO: Logging
-            }
-            return "Not Found";
         }
 
         public int CountHymnsInSongbook(int? id)

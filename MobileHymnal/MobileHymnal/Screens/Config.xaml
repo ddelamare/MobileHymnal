@@ -9,8 +9,8 @@
                 <Label Text="Font Size"/>
                 <Slider x:Name="scaleSlider"
                         Maximum="100"
-                        Value="{Binding FontSize, Mode=TwoWay, Source={StaticResource  configuration}}" />
-                <Label Text="Praise the Lord!" x:Name="sampleLabel"/>
+                        Value="{Binding FontSize, Mode=TwoWay, Source={StaticResource  configuration}}"/>
+                <Label Text="Praise the Lord!" x:Name="sampleLabel" BindingContext="{Reference Name=scaleSlider}" FontSize="{Binding Value}" TextColor="White"/>
                 <ActivityIndicator x:Name="waitSpinner"  IsEnabled="True" IsVisible="False" IsRunning="True"/>
                 <Button x:Name="importButton" Clicked="importButton_Clicked" Text="Import Hymnal" />
                 <Button x:Name="closeButton" Clicked="closeButton_Clicked"  Text="Close"/>

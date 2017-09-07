@@ -18,15 +18,17 @@ namespace MobileHymnal
         {
             InitializeComponent();
             // Load 
-            MainPage = new NavigationPage(new Selector()) {
-                Icon = null,
-                BarBackgroundColor = ConfigEngine.Current.NavigationBarColor
+            MainPage = new MasterDetailPage()
+            {
+                Master = new Config() {  Title ="Master"},
+                Detail = new NavigationPage(new Selector())
+                {
+                    Icon = null,
+                    BarBackgroundColor = ConfigEngine.Current.NavigationBarColor
+                },
+                Title = "Ball"
             };
             Application.Current.Resources["configuration"] = ConfigEngine.Current;
-            MainPage.ToolbarItems.Add(new ToolbarItem("Config", "", () =>
-            {
-                ((NavigationPage)MainPage).PushAsync(new Config());
-            }));
         }
 
         protected override void OnStart()

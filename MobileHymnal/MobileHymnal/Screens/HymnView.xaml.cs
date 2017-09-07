@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using System.Runtime.CompilerServices;
 
 namespace MobileHymnal.Screens
 {
@@ -18,23 +19,29 @@ namespace MobileHymnal.Screens
         Hymn _hymn = null;
         private string textClassName = "textStyle";
 		public HymnView (Hymn pageHymn)
-		{
+        {
             InitializeComponent();
             _hymn = pageHymn;
             this.BindingContext = _hymn;
+            BuildHymn();
+        }
+
+        private void BuildHymn()
+        {
             var lyrics = Database.GetContext().GetLyricsForHymn(_hymn.Id);
             var verseNum = 1;
             foreach (Lyric l in lyrics.Result.OrderBy(l => l.Order))
             {
                 if (l.IsChorus)
                 {
-                    lyricView.Children.Add(new Label()
+                    var label = new Label()
                     {
                         Text = l.Verse,
-                        Margin= new Thickness(20,10),
+                        Margin = new Thickness(20, 10),
                         TextColor = Color.Gray,
-                        Style = (Style)Application.Current.Resources[textClassName]
-                    });
+                    };
+                    label.SetDynamicResource(VisualElement.StyleProperty, textClassName);
+                    lyricView.Children.Add(label);
                 }
                 else
                 {
@@ -54,5 +61,14 @@ namespace MobileHymnal.Screens
             }
         }
 
-	}
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            base.OnPropertyChanged(propertyName);
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+        }
+    }
 }
