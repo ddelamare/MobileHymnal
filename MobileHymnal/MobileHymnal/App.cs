@@ -30,6 +30,10 @@ namespace MobileHymnal
             };
             MainPage = MasterDetail;
             Application.Current.Resources["configuration"] = ConfigEngine.Current;
+            Navigation.ToolbarItems.Add(new ToolbarItem("Search", "", () =>
+            {
+                Hymnal.Navigation.Navigation.PushModalAsync(new SearchWindow(), true);
+            }));
         }
 
         protected override void OnStart()

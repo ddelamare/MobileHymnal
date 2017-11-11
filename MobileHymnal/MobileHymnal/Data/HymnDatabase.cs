@@ -168,6 +168,20 @@ namespace MobileHymnal.Data
             }
         }
 
+
+        public Hymn GetHymnById(int? hymnId)
+        {
+            if (hymnId.GetValueOrDefault() > 0)
+            {
+                return _connection.FindAsync<Hymn>(h => h.Id == hymnId.Value).Result;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+
         async public Task<List<Lyric>> GetLyricsForHymn(int? hymnId)
         {
             if (hymnId.GetValueOrDefault() == 0)
@@ -175,6 +189,11 @@ namespace MobileHymnal.Data
                 return new List<Lyric>();
             }
             return await _connection.Table<Lyric>().Where(l => l.HymnId == hymnId.Value).ToListAsync().ConfigureAwait(false);
+        }
+
+        async public Task<List<Lyric>> Search(string text)
+        {
+            return await _connection.Table<Lyric>().Where(l => l.Verse.Contains(text)).Take(50).ToListAsync().ConfigureAwait(false);
         }
 
         // Attempt to auto join via link table. TODO: Add query caching

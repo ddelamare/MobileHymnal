@@ -15,5 +15,10 @@ namespace HymnalEntities.Hymnal
         public int SongbookId { get; set; } //TODO?: Move to lookup table so the same hymn can be in several places?
         public int HymnNumber { get; set; }
         public string Title { get; set; }
+
+        public string GenerateTitle()
+        {
+            return String.IsNullOrWhiteSpace(Title) ? $"Hymn #{HymnNumber}" : Title;
+        }
     }
 }

@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MobileHymnal.Screens.SearchWindow">
+    <ContentPage.Content>
+        <StackLayout BackgroundColor="White" VerticalOptions="Fill">
+                <SearchBar x:Name="searchField"  
+                           BackgroundColor="White" 
+                           HeightRequest="40" 
+                           TextColor="Black" 
+                           Placeholder="Click here to search" 
+                           Text="{Binding SearchText}"
+                           TextChanged="searchField_TextChanged"/>
+                <ListView x:Name="searchResults"  BackgroundColor="AliceBlue" ItemsSource="{Binding Results}" VerticalOptions="Fill" ItemSelected="searchResults_ItemSelected">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <TextCell Text="{Binding Verse}" TextColor="Black"/>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <!-- Search results will populate here -->
+                </ListView>
+            </StackLayout>
+
+  </ContentPage.Content>
+</ContentPage>

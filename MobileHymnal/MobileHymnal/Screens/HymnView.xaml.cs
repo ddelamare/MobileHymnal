@@ -26,6 +26,14 @@ namespace MobileHymnal.Screens
             BuildHymn();
         }
 
+        public HymnView(int hymnId)
+        {
+            InitializeComponent();
+            _hymn = Data.Database.GetContext().GetHymnById(hymnId);
+            this.BindingContext = _hymn;
+            BuildHymn();
+        }
+
         private void BuildHymn()
         {
             var lyrics = Database.GetContext().GetLyricsForHymn(_hymn.Id);
@@ -59,6 +67,8 @@ namespace MobileHymnal.Screens
                     });
                 }
             }
+
+            _hymn.Title = _hymn.GenerateTitle();
         }
 
         protected override void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -69,6 +79,12 @@ namespace MobileHymnal.Screens
         protected override void OnAppearing()
         {
             base.OnAppearing();
+        }
+
+        protected override void OnDisappearing()
+        {
+            Hymnal.Navigation.Title = "";
+            base.OnDisappearing();
         }
     }
 }

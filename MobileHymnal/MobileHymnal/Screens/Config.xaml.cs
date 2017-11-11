@@ -30,10 +30,9 @@ namespace MobileHymnal.Screens
 
         private async void importButton_Clicked(object sender, EventArgs e)
         {
-            waitSpinner.IsVisible = true;
-            FileData filedata = await CrossFilePicker.Current.PickFile();
             try
             {
+                FileData filedata = await CrossFilePicker.Current.PickFile();
                 Data.Database.GetContext().ImportHymnal(filedata);
                 await DisplayAlert("Import Success", "Import Complete.", "OK");
             }
@@ -41,7 +40,6 @@ namespace MobileHymnal.Screens
             {
                 await DisplayAlert("Import Failed", "Importing the hymnal failed. Probably because it is not in the right format", "OK");
             }
-            waitSpinner.IsVisible = false;
         }
     }
 }
