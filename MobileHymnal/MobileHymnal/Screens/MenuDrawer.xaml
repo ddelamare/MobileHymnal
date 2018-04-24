@@ -4,8 +4,15 @@
              x:Class="MobileHymnal.Screens.MenuDrawer">
     <ContentPage.Content>
         <StackLayout>
-            <Label Text="Cool! Options!" />
             <Button x:Name="configButton" Text="Configuration"  Clicked="configButton_Clicked"/>
+            <Label x:Name="historyLabel" Text="Hymn History" />
+            <ListView x:Name="hymnHistory"  BackgroundColor="Black" ItemsSource="{Binding History}" VerticalOptions="Fill" ItemSelected="hymnHistory_ItemSelected">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextCell Text="{Binding HymnNumber}" TextColor="White"/>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

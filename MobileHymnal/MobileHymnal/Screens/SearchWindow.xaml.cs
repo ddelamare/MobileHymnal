@@ -1,5 +1,6 @@
 ﻿using HymnalEntities.Hymnal;
 using HymnalEntities.ViewModel;
+using MobileHymnal.Data.Config;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -51,7 +52,7 @@ namespace MobileHymnal.Screens
                 sw.Start();
                 if (_model.SearchText.Length > 0)
                 {
-                    _model.Results = Data.Database.GetContext().Search(_model.SearchText).Result;
+                    _model.Results = Data.Database.GetContext().Search2(_model.SearchText).Result;
                 }
                 else
                 {
@@ -70,7 +71,9 @@ namespace MobileHymnal.Screens
         {
             try
             {
-                await Hymnal.Navigation.PushAsync(new HymnView(((Lyric)e.SelectedItem).HymnId));
+                var hymnId = ((Lyric)e.SelectedItem).HymnId;
+                ConfigEngine.Current.InsertHistory(hymnId);
+                await Hymnal.Navigation.PushAsync(new HymnView(hymnId));
                 await Hymnal.Navigation.Navigation.PopModalAsync(true);
             }
             catch (Exception ex)

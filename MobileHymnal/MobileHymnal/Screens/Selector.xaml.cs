@@ -87,7 +87,7 @@ namespace MobileHymnal.Screens
                 var hymn = Database.GetContext().GetHymnByNumber(_model.SelectedSongbook?.Id, hymnNum);
                 if (hymn != null)
                 {
-                    // TODO: Push to hymn view history
+                    ConfigEngine.Current.InsertHistory(hymn?.Id ?? 0);
                     await Navigation.PushAsync(new HymnView(hymn));
                 }
                 else if (hymnNum > 0)
@@ -103,7 +103,7 @@ namespace MobileHymnal.Screens
 
         private void SetHymnNumberMax()
         {
-            // Todo: find number of hymns in current hymnal
+            // find number of hymns in current hymnal
             var hymnCount = Database.GetContext().CountHymnsInSongbook(_model.SelectedSongbook.Id);
             _model.MaxHymnNumber = hymnCount;
         }
@@ -114,11 +114,6 @@ namespace MobileHymnal.Screens
             ConfigEngine.Current.SelectedSongbookId = _model.SelectedSongbook.Id.GetValueOrDefault();
         }
 
-        protected override void OnAppearing()
-        {
-            ClearPressed(null, null);
-            RefreshViewModel();
-            base.OnAppearing();
-        }
+
     }
 }

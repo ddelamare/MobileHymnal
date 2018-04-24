@@ -107,7 +107,7 @@ namespace MobileHymnal.Data.Config
             return new Color(r, g, b);
         }
 
-        private void SetColor(Color color, [CallerMemberName]string keyName = "")
+    private void SetColor(Color color, [CallerMemberName]string keyName = "")
         {
             if (color == null)
             {
@@ -120,6 +120,42 @@ namespace MobileHymnal.Data.Config
             AppSettings.AddOrUpdateValue(keyName + "_G", color.G);
             AppSettings.AddOrUpdateValue(keyName + "_B", color.B);
         }
-        #endregion
+
+        private const int HISTORY_LIMIT = 15;
+        string HISTORY_KEY = "HISTORY_PREFERENCE";
+        public List<int> GetHistory()
+        {
+            var history = AppSettings.GetValueOrDefault(HISTORY_KEY, "");
+            if (history.Length > 0)
+            {
+                return history.Split(';').Select(h => Int32.Parse(h)).ToList();
+            }
+            else
+            {
+                return new List<int>();
+            }
+        }
+
+        public void InsertHistory(int hymnId)
+        {
+            if (hymnId > 0)
+            {
+                // Check if it already exists
+                var history = GetHistory();
+                if (history.Contains(hymnId))
+                {
+                    // Remove item to be added in front
+                    history.Remove(hymnId);
+                }
+                history.Insert(0, hymnId);
+
+                // Get only the first configured number of items to write back
+                var newHistory = String.Join(";",history.Take(HISTORY_LIMIT));
+
+                AppSettings.AddOrUpdateValue(HISTORY_KEY, newHistory);
+                OnPropertyChanged();
+            }
+        }
+    #endregion
     }
 }

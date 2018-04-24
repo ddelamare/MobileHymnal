@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Xamarin.Forms;
 using Plugin.FilePicker.Abstractions;
+using MobileHymnal.Data.Config;
 
 namespace MobileHymnal.Data
 {
@@ -21,7 +22,7 @@ namespace MobileHymnal.Data
             try
             {
                 _connection = new SQLiteAsyncConnection(connectionPath);
-                
+
                 InitDatabase(false);
             }
             catch (Exception ex)
@@ -47,7 +48,7 @@ namespace MobileHymnal.Data
             _connection.CreateTableAsync<Songbook>(),
             _connection.CreateTableAsync<Hymn>(),
             _connection.CreateTableAsync<Hymn_Tag>(),
-            _connection.CreateTableAsync<Lyric>(),
+            _connection.CreateTableAsync<Lyric>(CreateFlags.FullTextSearch4),
             _connection.CreateTableAsync<Tag>()
             };
 
@@ -194,6 +195,28 @@ namespace MobileHymnal.Data
         async public Task<List<Lyric>> Search(string text)
         {
             return await _connection.Table<Lyric>().Where(l => l.Verse.Contains(text)).Take(50).ToListAsync().ConfigureAwait(false);
+        }
+
+        async public Task<List<Lyric>> Search2(string text)
+        {
+            //TODO: Sanitize
+            text = text+ "*"; // Auto do prefix searches
+            return await _connection.QueryAsync<Lyric>($"SELECT * FROM Lyric WHERE Verse MATCH '{text}'").ConfigureAwait(false);
+        }
+
+        async public Task<List<Hymn>> GetHistory()
+        {
+            var history = ConfigEngine.Current.GetHistory();
+            var historyList = new List<Hymn>();
+            foreach (var hist in history)
+            {
+                var hymn = GetHymnById(hist);
+                if (hymn != null)
+                {
+                    historyList.Add(hymn);
+                }
+            }
+            return historyList;
         }
 
         // Attempt to auto join via link table. TODO: Add query caching
